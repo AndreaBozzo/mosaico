@@ -99,8 +99,13 @@ mkdir -p "${TEST_DIRECTORY}"
 title "running test suite" "#" ${GREEN}
 
 title "setup" "-"
+echo "MOSAICO_REPOSITORY_DB_URL ${MOSAICO_REPOSITORY_DB_URL}"
+echo "DATABASE_URL=${DATABASE_URL}"
+echo "SQLX_OFFLINE=${SQLX_OFFLINE}"
 cd ${DOCKER_PATH}
 title "docker" "." ${BLUE}
+docker compose up -d --wait 2> /dev/null
+echo "Started ${BOLD}docker/testing${RESET} compose file"
 cd ${PYTHON_SDK_PATH}
 title "poetry" "." ${BLUE}
 poetry install
