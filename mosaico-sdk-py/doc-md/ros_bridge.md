@@ -110,10 +110,10 @@ mosaico-ros-injector ./data.db3 \
   --ros-distro ros2_humble
 ```
 
-The full list of options can be retrieved by running `mosaicolabs.ros_injector -h`:
+The full list of options can be retrieved by running `mosaico.ros_injector -h`:
 
 ```bash
-usage: mosaicolabs.ros_injector [-h] --name NAME [--host HOST] [--port PORT] [--topics TOPICS [TOPICS ...]] [--metadata METADATA]
+usage: mosaico.ros_injector [-h] --name NAME [--host HOST] [--port PORT] [--topics TOPICS [TOPICS ...]] [--metadata METADATA]
                                 [--ros-distro {empty,latest,ros1_noetic,ros2_dashing,ros2_eloquent,ros2_foxy,ros2_galactic,ros2_humble,ros2_iron,ros2_jazzy,ros2_kilted}]
                                 bag_path
 

@@ -24,7 +24,7 @@ A clear and concise description of what the bug is.
 
 ```bash
 # Example:
-poetry run mosaicolabs.ros_injector ./my_bag.mcap --name "Test_Seq" ...
+poetry run mosaico.ros_injector ./my_bag.mcap --name "Test_Seq" ...
 ```
 
 ### Include logs
