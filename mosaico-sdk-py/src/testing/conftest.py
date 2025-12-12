@@ -17,8 +17,12 @@ from .integration.config import (
 
 
 def pytest_addoption(parser):
-    parser.addoption("--host", action="store", type=str, help="Set client host.")
-    parser.addoption("--port", action="store", type=int, help="Set client port.")
+    parser.addoption(
+        "--host", action="store", default="localhost", type=str, help="Set client host."
+    )
+    parser.addoption(
+        "--port", action="store", default="6276", type=int, help="Set client port."
+    )
 
 
 @pytest.fixture(scope="session")
