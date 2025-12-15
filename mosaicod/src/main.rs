@@ -117,7 +117,7 @@ fn run(startup_time: &Instant) -> Result<(), Box<dyn std::error::Error>> {
                     args.host,
                     args.port,
                     &store_display_name,
-                    &get_version(),
+                    get_version(),
                     startup_time,
                 );
             })?;
@@ -167,11 +167,11 @@ fn get_store_display_name(store: &store::StoreRef) -> String {
     }
 }
 
-fn get_version() -> String {
+fn get_version() -> &'static str {
     if cfg!(debug_assertions) {
-        "devel".to_string()
+        "devel"
     } else {
-        env!("CARGO_PKG_VERSION").to_string()
+        env!("CARGO_PKG_VERSION")
     }
 }
 
