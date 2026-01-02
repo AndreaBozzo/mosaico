@@ -33,30 +33,25 @@ pub async fn list_flights(
 
     trace!("found {} sequences", sequences.len());
 
-    // Convert each sequence locator to a minimal FlightInfo
-    let flight_infos: Vec<Result<FlightInfo, Status>> = sequences
-        .into_iter()
-        .map(|locator| {
-            let sequence_name = locator.name().to_string();
+    // Create the stream directly from the iterator to avoid intermediate allocation.
+    // TODO: Currently this iterates over an in-memory vector.
+    // In the future, if the number of sequences grows large, consider implementing
+    // a true streaming solution from the repository layer.
+    let stream = futures::stream::iter(sequences.into_iter().map(|locator| {
+        let sequence_name = locator.name().to_string();
 
-            // Create flight descriptor with the sequence path
-            let descriptor = FlightDescriptor::new_path(vec![sequence_name.clone()]);
+        // Create flight descriptor with the sequence path
+        let descriptor = FlightDescriptor::new_path(vec![sequence_name.clone()]);
 
-            // Create a ticket using the sequence name
-            let endpoint = FlightEndpoint::new().with_ticket(Ticket {
-                ticket: sequence_name.into(),
-            });
+        // Create a ticket using the sequence name
+        let endpoint = FlightEndpoint::new().with_ticket(Ticket {
+            ticket: sequence_name.into(),
+        });
 
-            let flight_info = FlightInfo::new()
-                .with_descriptor(descriptor)
-                .with_endpoint(endpoint);
-
-            Ok(flight_info)
-        })
-        .collect();
-
-    // Create the stream from the vector
-    let stream = futures::stream::iter(flight_infos);
+        Ok(FlightInfo::new()
+            .with_descriptor(descriptor)
+            .with_endpoint(endpoint))
+    }));
 
     Ok(Box::pin(stream))
 }
