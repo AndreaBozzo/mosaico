@@ -1,4 +1,5 @@
 use crate::{params, rw, traits};
+use std::collections::HashMap;
 use std::path;
 
 pub struct ResourceId {
@@ -199,22 +200,27 @@ impl SequenceTopicGroups {
     /// Consumes the current group and a provided group to produce a new group in which
     /// the sequences are intersected while the topics are joined
     pub fn merge(self, group: Self) -> Self {
-        let mut result = Self::empty();
-        for mut grp1 in self.0 {
-            let found = group
-                .0
-                .iter()
-                .find(|grp2| grp1.sequence.name() == grp2.sequence.name());
+        let mut result = Vec::new();
 
-            if let Some(found) = found {
-                grp1.topics.extend(found.topics.clone());
-                result
-                    .0
-                    .push(SequenceTopicGroup::new(found.sequence.clone(), grp1.topics));
+        // Optimization: Use a HashMap for O(1) lookup and avoid cloning.
+        // We consume the second group, extracting topics keyed by sequence name.
+        let mut group_map: HashMap<String, Vec<TopicResourceLocator>> = group
+            .0
+            .into_iter()
+            .map(|g| {
+                let (seq, topics) = g.into_parts();
+                (seq.into(), topics)
+            })
+            .collect();
+
+        for mut grp1 in self.0 {
+            if let Some(topics2) = group_map.remove(grp1.sequence.name()) {
+                grp1.topics.extend(topics2);
+                result.push(grp1);
             }
         }
 
-        result
+        Self(result)
     }
 }
 
