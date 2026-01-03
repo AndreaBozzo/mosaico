@@ -202,7 +202,7 @@ impl SequenceTopicGroups {
     pub fn merge(self, group: Self) -> Self {
         let mut result = Vec::new();
 
-        // Optimization: Use a HashMap for O(1) lookup and avoid cloning.
+        // We use an HashMap for O(1) lookup and avoid cloning.
         // We consume the second group, extracting topics keyed by sequence name.
         let mut group_map: HashMap<String, Vec<TopicResourceLocator>> = group
             .0
