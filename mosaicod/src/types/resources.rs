@@ -297,5 +297,37 @@ mod tests {
     }
 
     #[test]
-    fn merge_sequence_topic_groups() {}
+    fn merge_sequence_topic_groups() {
+        // Group 1: seq_a con topic1, seq_b con topic2
+        let group1 = SequenceTopicGroups::new(vec![
+            SequenceTopicGroup::new(
+                SequenceResourceLocator::from("seq_a"),
+                vec![TopicResourceLocator::from("topic1")],
+            ),
+            SequenceTopicGroup::new(
+                SequenceResourceLocator::from("seq_b"),
+                vec![TopicResourceLocator::from("topic2")],
+            ),
+        ]);
+
+        // Group 2: seq_a con topic3 (match), seq_c con topic4 (no match)
+        let group2 = SequenceTopicGroups::new(vec![
+            SequenceTopicGroup::new(
+                SequenceResourceLocator::from("seq_a"),
+                vec![TopicResourceLocator::from("topic3")],
+            ),
+            SequenceTopicGroup::new(
+                SequenceResourceLocator::from("seq_c"),
+                vec![TopicResourceLocator::from("topic4")],
+            ),
+        ]);
+
+        let merged: Vec<SequenceTopicGroup> = group1.merge(group2).into();
+
+        // Solo seq_a dovrebbe sopravvivere (intersezione)
+        assert_eq!(merged.len(), 1);
+        assert_eq!(merged[0].sequence.name(), "seq_a");
+        // topic1 + topic3 merged
+        assert_eq!(merged[0].topics.len(), 2);
+    }
 }
