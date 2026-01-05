@@ -84,5 +84,6 @@ pub struct LayerUpdate {
 #[derive(Deserialize, Debug)]
 pub struct Query {
     #[serde(flatten)]
+    /// Query filter used to find matches in the system
     pub query: serde_json::Value,
 }
