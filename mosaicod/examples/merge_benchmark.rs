@@ -11,7 +11,7 @@ use std::time::{Duration, Instant};
 #[allow(dead_code)]
 struct TopicResourceLocator(String);
 
-#[derive(Clone)]
+#[derive(Clone, PartialOrd, Ord, PartialEq, Eq)]
 struct SequenceResourceLocator(String);
 
 impl SequenceResourceLocator {
@@ -68,18 +68,23 @@ impl SequenceTopicGroups {
     }
 
     /// Linear search merge: O(n*m) time complexity
-    fn merge_linear(self, group: Self) -> Self {
-        let mut result = Vec::new();
+    fn merge_linear(self, mut group: Self) -> Self {
+        // Set vector capacity to the maximum beween the two group to avoiding allocations
+        let max_capacity = group.0.len().max(self.0.len());
+        let mut result = Vec::with_capacity(max_capacity);
 
-        for mut grp1 in self.0 {
+        group
+            .0
+            .sort_by(|a, b| a.sequence.name().cmp(&b.sequence.name()));
+
+        for mut self_grp in self.0 {
             let found = group
                 .0
-                .iter()
-                .find(|grp2| grp1.sequence.name() == grp2.sequence.name());
+                .binary_search_by(|grp_aux| self_grp.sequence.name().cmp(&grp_aux.sequence.name()));
 
-            if let Some(found) = found {
-                grp1.topics.extend(found.topics.iter().cloned());
-                result.push(grp1);
+            if let Ok(found) = found {
+                self_grp.topics.extend(group.0[found].topics.clone());
+                result.push(self_grp);
             }
         }
 
@@ -178,12 +183,12 @@ fn main() {
     println!();
 
     let scenarios = [
-        (5, 3),
-        (10, 5),
-        (50, 8),
-        (100, 10),
-        (500, 15),
-        (1000, 20),
+        (5, 10),
+        (10, 20),
+        (20, 50),
+        (50, 100),
+        (80, 500),
+        (100, 1000),
     ];
 
     const ITERATIONS: usize = 2000;
@@ -192,7 +197,9 @@ fn main() {
 
     println!(
         "Config: {} iterations, {} warmup, {:.0}% overlap",
-        ITERATIONS, WARMUP, OVERLAP * 100.0
+        ITERATIONS,
+        WARMUP,
+        OVERLAP * 100.0
     );
     println!();
 
