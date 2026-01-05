@@ -7,11 +7,11 @@ use std::time::{Duration, Instant};
 
 // Standalone replica of project types
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 #[allow(dead_code)]
 struct TopicResourceLocator(String);
 
-#[derive(Clone, PartialOrd, Ord, PartialEq, Eq)]
+#[derive(Clone, PartialOrd, Ord, PartialEq, Eq, Debug)]
 struct SequenceResourceLocator(String);
 
 impl SequenceResourceLocator {
@@ -20,7 +20,7 @@ impl SequenceResourceLocator {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct SequenceTopicGroup {
     sequence: SequenceResourceLocator,
     topics: Vec<TopicResourceLocator>,
@@ -75,12 +75,12 @@ impl SequenceTopicGroups {
 
         group
             .0
-            .sort_by(|a, b| a.sequence.name().cmp(&b.sequence.name()));
+            .sort_by(|a, b| a.sequence.name().cmp(b.sequence.name()));
 
         for mut self_grp in self.0 {
             let found = group
                 .0
-                .binary_search_by(|grp_aux| self_grp.sequence.name().cmp(&grp_aux.sequence.name()));
+                .binary_search_by(|grp_aux| self_grp.sequence.name().cmp(grp_aux.sequence.name()));
 
             if let Ok(found) = found {
                 self_grp.topics.extend(group.0[found].topics.clone());
