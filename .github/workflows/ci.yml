@@ -188,13 +188,4 @@ jobs:
         run: cargo build
 
       - name: Run Integration Tests
-        run: |
-          mkdir -p /tmp/__mosaico_auto_testing__
-          cd mosaicod
-          ./target/debug/mosaicod run --port 6276 --local-store /tmp/__mosaico_auto_testing__ > /tmp/mosaicod_e2e_testing.out 2>&1 &
-          MOSAICOD_PID=$!
-          echo "Started mosaicod with PID: $MOSAICOD_PID"
-          sleep 5
-          cd ../mosaico-sdk-py
-          poetry run pytest ./src/testing -k integration
-          kill $MOSAICOD_PID 2>/dev/null || true
+        run: ./scripts/integration_tests.sh
