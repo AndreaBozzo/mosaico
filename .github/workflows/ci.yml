@@ -47,9 +47,8 @@ jobs:
           shared-key: "rust-stable"
 
       - name: Run Linter
-        run: |
-          cd mosaicod
-          cargo lint
+        working-directory: mosaicod
+        run: cargo lint
 
   backend-unit-tests:
     runs-on: ubuntu-latest
@@ -95,9 +94,7 @@ jobs:
           sudo apt-get install -y libpq-dev
 
       - name: Run Unit Tests
-        run: |
-          cd mosaicod
-          cargo test
+        run: ./scripts/tests.sh --mosaicod
 
   python-sdk-unit-tests:
     runs-on: ubuntu-latest
@@ -116,13 +113,8 @@ jobs:
           python-version: '3.13'
           cache: 'poetry'
 
-      - name: Install Dependencies
-        working-directory: mosaico-sdk-py
-        run: poetry install
-
       - name: Run Unit Tests
-        working-directory: mosaico-sdk-py
-        run: poetry run pytest ./src/testing -k unit
+        run: ./scripts/tests.sh --sdk-python
 
   integration-tests:
     runs-on: ubuntu-latest
@@ -179,13 +171,5 @@ jobs:
           python-version: '3.13'
           cache: 'poetry'
 
-      - name: Install Python Dependencies
-        working-directory: mosaico-sdk-py
-        run: poetry install
-
-      - name: Build mosaicod
-        working-directory: mosaicod
-        run: cargo build
-
       - name: Run Integration Tests
-        run: ./scripts/integration_tests.sh
+        run: ./scripts/tests.sh --integration
