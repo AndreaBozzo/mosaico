@@ -44,6 +44,7 @@ jobs:
           workspaces: "mosaicod -> target"
           cache-targets: true
           cache-on-failure: true
+          shared-key: "rust-stable"
 
       - name: Run Linter
         run: |
@@ -86,6 +87,7 @@ jobs:
           workspaces: "mosaicod -> target"
           cache-targets: true
           cache-on-failure: true
+          shared-key: "rust-stable"
 
       - name: Install System Dependencies
         run: |
@@ -105,23 +107,22 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v6
 
+      - name: Install Poetry
+        run: pipx install poetry
+
       - name: Setup Python
         uses: actions/setup-python@v6.1.0
         with:
           python-version: '3.13'
-
-      - name: Install Poetry
-        run: pipx install poetry
+          cache: 'poetry'
 
       - name: Install Dependencies
-        run: |
-          cd mosaico-sdk-py
-          poetry install
+        working-directory: mosaico-sdk-py
+        run: poetry install
 
       - name: Run Unit Tests
-        run: |
-          cd mosaico-sdk-py
-          poetry run pytest ./src/testing -k unit
+        working-directory: mosaico-sdk-py
+        run: poetry run pytest ./src/testing -k unit
 
   integration-tests:
     runs-on: ubuntu-latest
@@ -162,29 +163,29 @@ jobs:
           workspaces: "mosaicod -> target"
           cache-targets: true
           cache-on-failure: true
+          shared-key: "rust-stable"
 
       - name: Install System Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libpq-dev
 
+      - name: Install Poetry
+        run: pipx install poetry
+
       - name: Setup Python
         uses: actions/setup-python@v6.1.0
         with:
           python-version: '3.13'
-
-      - name: Install Poetry
-        run: pipx install poetry
+          cache: 'poetry'
 
       - name: Install Python Dependencies
-        run: |
-          cd mosaico-sdk-py
-          poetry install
+        working-directory: mosaico-sdk-py
+        run: poetry install
 
       - name: Build mosaicod
-        run: |
-          cd mosaicod
-          cargo build
+        working-directory: mosaicod
+        run: cargo build
 
       - name: Run Integration Tests
         run: |
