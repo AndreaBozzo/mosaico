@@ -19,10 +19,10 @@ DOCKER_DIR="docker/testing"
 TEST_DIRECTORY="/tmp/__mosaico_auto_testing__"
 
 # Environment variables (with defaults)
-RUST_LOG="${RUST_LOG:-mosaico=trace}"
-MOSAICO_REPOSITORY_DB_URL="${MOSAICO_REPOSITORY_DB_URL:-postgresql://postgres:password@localhost:6543/mosaico}"
+RUST_LOG="mosaico=trace"
+MOSAICO_REPOSITORY_DB_URL="postgresql://postgres:password@localhost:6543/mosaico"
 RUST_BACKTRACE="${RUST_BACKTRACE:-1}"
-SQLX_OFFLINE="${SQLX_OFFLINE:-true}"
+SQLX_OFFLINE="true"
 
 # Resolve paths
 FILE_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -41,7 +41,7 @@ export RUST_BACKTRACE
 # Colors (with fallback for non-interactive terminals)
 setup_colors() {
     if [ -t 1 ]; then
-        COLS=$(tput cols 2>/dev/null || echo 80)
+        COLS=$(tput cols || echo 80)
         RED=$(tput setaf 1)
         GREEN=$(tput setaf 2)
         YELLOW=$(tput setaf 3)
@@ -132,21 +132,13 @@ Examples:
 EOF
 }
 
-# Start Docker environment (skipped if PostgreSQL is already available, e.g., in CI)
 start_docker() {
     if [ "$DOCKER_STARTED" = false ]; then
-        # Check if PostgreSQL is already running (e.g., via GitHub Actions service container)
-        if pg_isready -h localhost -p 6543 -U postgres 2>/dev/null; then
-            echo "${DIM}PostgreSQL already running, skipping docker compose${RESET}"
-            DOCKER_STARTED=true
-            return
-        fi
-
+        DOCKER_STARTED=true
         title "docker" "." "${BLUE}"
         cd "${DOCKER_PATH}"
         docker compose up -d --wait 2>/dev/null
         echo "Started ${BOLD}docker/testing${RESET} compose file"
-        DOCKER_STARTED=true
     fi
 }
 
@@ -245,7 +237,7 @@ main() {
         done
     fi
 
-    title "running test suite" "#" "${GREEN}"
+    title "test runner" "#" "${GREEN}"
 
     # Print configuration
     title "setup" "-"
